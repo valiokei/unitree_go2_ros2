@@ -26,7 +26,7 @@
     <!-- ROS2 Control plugin -->
     <gazebo>
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">  
-        <parameters>$(find go2_config)/config/ros_control/ros_control.yaml</parameters>
+        <parameters>$(find unitree_go2_sim)/config/ros_control/ros_control.yaml</parameters>
         <robot_param_node>robot_state_publisher</robot_param_node>
       </plugin>
     </gazebo>
