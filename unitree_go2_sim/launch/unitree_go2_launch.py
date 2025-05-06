@@ -19,7 +19,6 @@ from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitut
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
-    # description_path = LaunchConfiguration("description_path")
     base_frame = "base_link"
 
     unitree_go2_sim = launch_ros.substitutions.FindPackageShare(
@@ -170,7 +169,6 @@ def generate_launch_description():
     )
     
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    # pkg_project_description = get_package_share_directory('go2_config')
     
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
@@ -221,9 +219,7 @@ def generate_launch_description():
         ],
     )
     
-    # Use spawner nodes directly to handle the configuration step - this is key!
-    # The controller_manager/spawner executable is designed to handle the proper
-    # lifecycle transitions (load → configure → activate)
+    # Use spawner nodes directly to handle the configuration step. (load → configure → activate)
     controller_spawner_js = TimerAction(
         period=15.0,  # Wait for Gazebo to fully initialize
         actions=[
@@ -256,7 +252,7 @@ def generate_launch_description():
         ]
     )
     
-    # Add a shell script to manually check controller status 
+    # Shell script to manually check controller status 
     controller_status_check = TimerAction(
         period=25.0,  # Check status after controllers should be loaded
         actions=[

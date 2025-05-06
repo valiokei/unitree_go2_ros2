@@ -2,15 +2,17 @@
 
 ![Unitree Go2](https://oss-global-cdn.unitree.com/static/c487f93e06954100a44fac4442b94d94_288x238.png)
 
-This package contains the configuration and integration of the Unitree Go2 robot with the CHAMP controller framework for ROS 2 Jazzy. It includes custom development of configuration packages and upgrades to the robot description model specifically adapted for ROS 2.
+## Overview
+
+This package provides a complete ROS 2 Jazzy integration for the Unitree Go2 quadrupedal robot using the CHAMP controller framework. It includes custom configuration packages and robot description models specifically adapted for ROS 2, enabling simulation, control, and autonomous operation capabilities.
 
 ## About Unitree Go2
 
-The Go2 is a quadrupedal robot developed by Unitree Robotics, designed for both research and commercial applications. It features powerful actuators, advanced sensor integration capabilities, and a robust mechanical design ideal for various terrain navigation.
+The Go2 is a quadrupedal robot manufactured by Unitree Robotics, designed for both research and commercial applications. It features powerful actuators, advanced sensor integration, and a robust mechanical design capable of navigating various terrains.
 
 ## About CHAMP Controller
 
-CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source development framework specifically designed for building new quadrupedal robots and developing novel control algorithms. The control framework is based on hierarchical control principles that combine pattern modulation and impedance control techniques.
+CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source development framework designed for quadrupedal robots. It provides a hierarchical control system that combines pattern modulation and impedance control techniques for efficient locomotion.
 
 ![CHAMP Controller](https://raw.githubusercontent.com/chvmp/champ/master/docs/images/robots.gif)
 
@@ -22,7 +24,7 @@ CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source developme
 - ✅ Teleoperation using keyboard
 - ✅ RVIZ visualization
 - ✅ Integrated gait control and configuration
-- ❌ Simulated sensors:(in progress)
+- ❌ Simulated sensors (in progress):
   - ❌ IMU
   - ❌ 2D LiDAR (Hokuyo)
   - ❌ 3D LiDAR (Velodyne)
@@ -51,23 +53,14 @@ sudo apt install ros-jazzy-velodyne-gazebo-plugins
 sudo apt install ros-jazzy-velodyne-description
 ```
 
-<!-- ### 2. Clone and Install CHAMP and Related Packages
-
-First, ensure you have the core CHAMP packages installed:
+### 2. Clone and Install CHAMP Controller and Go2 Simulation Packages
 
 ```bash
 cd ~/ros2_ws/src
-git clone https://github.com/chvmp/champ
-``` -->
-
-### 3. Clone and Install CHAMP Controller and Go2 simulation robot Packages
-
-```bash
-cd ~/ros2_ws/src
-git clone https://github.com/anujjain-dev/unitree-go2-ros2.git
+git clone https://github.com/khaledgabr77/unitree_go2_ros2
 ```
 
-### 4. Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 cd ~/ros2_ws
@@ -75,7 +68,7 @@ rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 ```
 
-### 5. Build the Workspace
+### 4. Build the Workspace
 
 ```bash
 cd ~/ros2_ws
@@ -93,9 +86,9 @@ Launch the Gazebo simulation:
 ros2 launch unitree_go2_sim unitree_go2_launch.py
 ```
 
-![unitree_go2](<unitree_go2_sim.png>)
+![Unitree Go2 Simulation](unitree_go2_sim.png)
 
-[Watch on YouTube](https://youtu.be/NUu7TaZhaQM)
+[Watch Demo on YouTube](https://youtu.be/NUu7TaZhaQM)
 
 ### RVIZ Visualization
 
@@ -105,7 +98,7 @@ Launch Gazebo with RVIZ:
 ros2 launch unitree_go2_sim unitree_go2_launch.py rviz:=true
 ```
 
-![alt text](<unitree_go2_vis.png>)
+![RVIZ Visualization](unitree_go2_vis.png)
 
 ### Teleoperation
 
@@ -114,29 +107,6 @@ Control the robot using keyboard:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
-
-<!-- ### Using the Velodyne Configuration
-
-Launch the Gazebo simulation with Velodyne LiDAR:
-
-```bash
-ros2 launch go2_config gazebo_velodyne.launch.py
-```
-
-Launch with RVIZ (remember to set PointCloud2 topic to `/velodyne_points` in RVIZ):
-
-```bash
-ros2 launch go2_config gazebo_velodyne.launch.py rviz:=true
-```
-
-### Using 2D LiDAR Instead of 3D Velodyne
-
-To use the Hokuyo 2D LiDAR instead of the 3D Velodyne:
-
-1. Edit the `robot_VLP.xacro` file located in `go2_description/xacro/` folder
-2. Comment out: `<xacro:include filename="$(find go2_description)/xacro/velodyne.xacro"/>`
-3. Uncomment: `<xacro:include filename="$(find go2_description)/xacro/laser.xacro"/>`
-4. Rebuild your workspace -->
 
 ## Tuning Gait Parameters
 
@@ -157,16 +127,9 @@ The gait configuration for the robot is found in `unitree_go2_sim/config/gait/ga
 
 ## Project Structure
 
-- `champ_base/`: Core controllers and state estimation for CHAMP
+- `champ/`: Core controllers and state estimation for CHAMP
 - `unitree_go2_description/`: URDF models, meshes, and world files
 - `unitree_go2_sim/`: Simulation launch files and configuration
-
-<!-- ## Roadmap
-
-- [ ] Implement SLAM functionality
-- [ ] Add Navigation 2 integration
-- [ ] Support for real hardware connection
-- [ ] Improved terrain handling -->
 
 ## Contributing
 
