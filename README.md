@@ -86,7 +86,7 @@ Launch the Gazebo simulation:
 ros2 launch unitree_go2_sim unitree_go2_launch.py
 ```
 
-![Unitree Go2 Simulation](unitree_go2_sim.png)
+![Unitree Go2 Simulation](docs/unitree_go2_sim.png)
 
 [Watch Demo on YouTube](https://youtu.be/NUu7TaZhaQM)
 
@@ -98,7 +98,7 @@ Launch Gazebo with RVIZ:
 ros2 launch unitree_go2_sim unitree_go2_launch.py rviz:=true
 ```
 
-![RVIZ Visualization](unitree_go2_vis.png)
+![RVIZ Visualization](docs/unitree_go2_vis.png)
 
 ### Teleoperation
 
