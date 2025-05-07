@@ -151,5 +151,3 @@ This project builds upon and incorporates work from the following projects:
 * [unitree-go2-ros2](https://github.com/anujjain-dev/unitree-go2-ros2) - ROS 2 package with gazebo classic
 
 ## License
-
-This project is licensed under the BSD 3-Clause License - see the LICENSE file for details.
