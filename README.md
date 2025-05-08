@@ -28,7 +28,12 @@ CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source developme
   - ✅ IMU
   - ✅ 2D LiDAR (Hokuyo)
   - ✅ 3D LiDAR (Velodyne)
-  - ✅ 3D LiDAR (4D Lidar L1)
+  - ✅ 3D LiDAR (4D Lidar L1) (need some imporvments)
+  - ❌ Mono Camera
+  - ❌ Depth Camera
+  - ❌ GPS
+- ✅ Point cloud visualization in RVIZ
+- ✅ Multiple sensor configurations available
 - ❌ Full SLAM functionality (Coming soon)
 - ❌ Navigation 2 integration (Coming soon)
 
@@ -92,6 +97,8 @@ ros2 launch unitree_go2_sim unitree_go2_launch.py
 
 ### RVIZ Visualization
 
+The package now includes both `Velodyne 3D LiDAR` and `4D Lidar L1` sensors. You can visualize the point cloud data in RVIZ:
+
 Launch Gazebo with RVIZ:
 
 ```bash
@@ -99,6 +106,22 @@ ros2 launch unitree_go2_sim unitree_go2_launch.py rviz:=true
 ```
 
 ![RVIZ Visualization](docs/unitree_go2_vis.png)
+
+**Velodyne Lidar and 4D Lidar L1**
+
+![Velodyne Lidar and 4D Lidar L1](docs/1.png)
+
+**Velodyne Lidar Beams**
+
+![Velodyne Lidar Beams](docs/2.png)
+
+**4D Lidar L1 Beams**
+
+![4D Lidar L1 Beams](docs/3.png)
+
+**Velodyne Lidar and 4D Lidar L1 Beams**
+
+![Velodyne Lidar and 4D Lidar L1 Beams](docs/4.png)
 
 ### Teleoperation
 
@@ -124,6 +147,8 @@ The gait configuration for the robot is found in `unitree_go2_sim/config/gait/ga
 | Robot Walking Height | Distance from hip to ground while walking (m) |
 | CoM X Translation | Offset to compensate for weight distribution |
 | Odometry Scaler | Multiplier to calculated velocities for dead reckoning |
+
+![Velodyne Lidar and 4D Lidar L1](docs/image.png)
 
 ## Project Structure
 
