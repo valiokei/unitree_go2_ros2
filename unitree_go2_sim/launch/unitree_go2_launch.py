@@ -41,7 +41,7 @@ def generate_launch_description():
         description="Use simulation (Gazebo) clock if true",
     )
     declare_rviz = DeclareLaunchArgument(
-        "rviz", default_value="false", description="Launch rviz"
+        "rviz", default_value="true", description="Launch rviz"
     )
     declare_robot_name = DeclareLaunchArgument(
         "robot_name", default_value="go2", description="Robot name"
@@ -165,7 +165,7 @@ def generate_launch_description():
         name='rviz2',
         arguments=['-d', os.path.join(unitree_go2_sim, "rviz/urdf_viewer.rviz")],
         condition=IfCondition(LaunchConfiguration("rviz")),
-        parameters=[{"use_sim_time": use_sim_time}]
+        # parameters=[{"use_sim_time": use_sim_time}]
     )
     
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
@@ -206,12 +206,13 @@ def generate_launch_description():
         arguments=[
             # Gazebo to ROS
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU',
-            '/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
-            '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
-            '/velodyne_points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
-            '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+            '/imu/data@sensor_msgs/msg/Imu@gz.msgs.IMU',
+            '/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V',
+            '/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model',
+            '/velodyne_points/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
+            '/unitree_lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
+            # '/velodyne_points@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
+            '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
             
             # ROS to Gazebo
             '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',

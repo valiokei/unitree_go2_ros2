@@ -24,10 +24,11 @@ CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source developme
 - ✅ Teleoperation using keyboard
 - ✅ RVIZ visualization
 - ✅ Integrated gait control and configuration
-- ❌ Simulated sensors (in progress):
-  - ❌ IMU
-  - ❌ 2D LiDAR (Hokuyo)
-  - ❌ 3D LiDAR (Velodyne)
+- ✅ Simulated sensors (in progress):
+  - ✅ IMU
+  - ✅ 2D LiDAR (Hokuyo)
+  - ✅ 3D LiDAR (Velodyne)
+  - ✅ 3D LiDAR (4D Lidar L1)
 - ❌ Full SLAM functionality (Coming soon)
 - ❌ Navigation 2 integration (Coming soon)
 
@@ -49,7 +50,6 @@ sudo apt install ros-jazzy-robot-localization
 sudo apt install ros-jazzy-ros2-controllers
 sudo apt install ros-jazzy-ros2-control
 sudo apt install ros-jazzy-velodyne
-sudo apt install ros-jazzy-velodyne-gazebo-plugins
 sudo apt install ros-jazzy-velodyne-description
 ```
 
