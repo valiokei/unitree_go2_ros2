@@ -1,6 +1,8 @@
 # Unitree Go2 ROS2
 
-![Unitree Go2](https://oss-global-cdn.unitree.com/static/c487f93e06954100a44fac4442b94d94_288x238.png)
+<p align="center">
+  <img src="https://oss-global-cdn.unitree.com/static/c487f93e06954100a44fac4442b94d94_288x238.png" alt="Unitree Go2" />
+</p>
 
 ## Overview
 
@@ -29,7 +31,7 @@ CHAMP (Coupled Hybrid Automata for Mobile Platforms) is an open-source developme
   - ✅ 2D LiDAR (Hokuyo)
   - ✅ 3D LiDAR (Velodyne)
   - ✅ 3D LiDAR (4D Lidar L1) (need some imporvments)
-  - ❌ Mono Camera
+  - ✅ Mono Camera
   - ❌ Depth Camera
   - ❌ GPS
 - ✅ Point cloud visualization in RVIZ
@@ -122,6 +124,10 @@ ros2 launch unitree_go2_sim unitree_go2_launch.py rviz:=true
 **Velodyne Lidar and 4D Lidar L1 Beams**
 
 ![Velodyne Lidar and 4D Lidar L1 Beams](docs/4.png)
+
+**Mono Camera**
+
+![Mono Camera](docs/camera.png)
 
 ### Teleoperation
 
