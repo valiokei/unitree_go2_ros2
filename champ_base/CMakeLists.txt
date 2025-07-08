@@ -64,6 +64,15 @@ install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME} 
 )
 
+# Install Python scripts as executables
+install(  PROGRAMS
+    scripts/joint_trajectory_to_joint_states.py
+    scripts/simple_odometry.py
+    scripts/interactive_target_mover.py
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+
 add_library(quadruped_controller SHARED src/quadruped_controller.cpp)
 ament_target_dependencies(quadruped_controller ${dependencies})
 add_executable(quadruped_controller_node src/quadruped_controller_node.cpp)

@@ -1,0 +1,28 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/valiokei/GitHub/Magnetic-Deck-firmware/build",
+        "/home/valiokei/GitHub/ros_ws/install/unitree_teleop/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/unitree_msgs/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_sim/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_examples/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_py/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_interfaces/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/champ_msgs/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/CrazyFlyMagneticNode/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/valiokei/GitHub/Magnetic-Deck-firmware/build",
+        "/home/valiokei/GitHub/ros_ws/install/unitree_teleop/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/unitree_msgs/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_sim/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_examples/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_py/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/crazyflie_interfaces/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/champ_msgs/lib/python3.12/site-packages",
+        "/home/valiokei/GitHub/ros_ws/install/CrazyFlyMagneticNode/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "ros.distro": "jazzy",
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true
+}

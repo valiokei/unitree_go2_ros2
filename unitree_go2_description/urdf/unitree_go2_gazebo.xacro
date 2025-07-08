@@ -15,13 +15,16 @@
   </gazebo>
 
   <!-- Robot-wide physics properties -->
+  <!-- Physics system è già definito nel world SDF, rimuoviamo per evitare conflitti -->
+  <!-- 
   <gazebo>
     <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics">
       <engine>
-        <filename>gz-physics-ode-plugin</filename>
+        <filename>gz-physics-bullet-plugin</filename>
       </engine>
     </plugin>
   </gazebo>
+  -->
 
   <!-- ROS2 Control plugin -->
   <gazebo>
@@ -39,7 +42,7 @@
       <visualize>true</visualize>
       <topic>imu</topic>
       <gz_frame_id>imu_link</gz_frame_id>
-      <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+      <plugin filename="gz-sim8-imu-system" name="gz::sim::systems::Imu">
         <initial_orientation_as_reference>false</initial_orientation_as_reference>
       </plugin>
     </sensor>
