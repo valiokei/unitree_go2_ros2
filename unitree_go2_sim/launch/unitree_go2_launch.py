@@ -37,7 +37,7 @@ def generate_launch_description():
 
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
-        default_value="false",
+        default_value="true",
         description="Use simulation (Gazebo) clock if true",
     )
     declare_rviz = DeclareLaunchArgument(
@@ -93,107 +93,138 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {"use_sim_time": use_sim_time},
-            {"gazebo": False},  # Non stiamo usando Gazebo
+            {"gazebo": True},
             {"publish_joint_states": True},
-            {"publish_joint_control": True},  # Pubblichiamo comandi di controllo per RViz
-            {"publish_foot_contacts": False},
+            {"publish_joint_control": True},
+            # {"publish_foot_contacts": False},
             {"joint_controller_topic": "joint_group_effort_controller/joint_trajectory"},
             {"urdf": Command(['xacro ', LaunchConfiguration('unitree_go2_description_path')])},
             joints_config,
             links_config,
             gait_config,
             {"hardware_connected": False},
-            {"publish_foot_contacts": False},
-            {"close_loop_odom": False},  # Odom semplificata
+            {"publish_foot_contacts": True},
+            {"close_loop_odom": True},
         ],
         remappings=[("/cmd_vel/smooth", "/cmd_vel")],
     )
 
-    # Semplifichiamo rimuovendo i nodi EKF per ora
-    # state_estimator_node = Node(
-    #     package="champ_base",
-    #     executable="state_estimation_node",
-    #     output="screen",
-    #     parameters=[
-    #         {"use_sim_time": use_sim_time},
-    #         {"orientation_from_imu": True},
-    #         {"urdf": Command(['xacro ', LaunchConfiguration('unitree_go2_description_path')])},
-    #         joints_config,
-    #         links_config,
-    #         gait_config,
-    #     ],
-    # )
+    state_estimator_node = Node(
+        package="champ_base",
+        executable="state_estimation_node",
+        output="screen",
+        parameters=[
+            {"use_sim_time": use_sim_time},
+            {"orientation_from_imu": True},
+            {"urdf": Command(['xacro ', LaunchConfiguration('unitree_go2_description_path')])},
+            joints_config,
+            links_config,
+            gait_config,
+        ],
+    )
 
-    # base_to_footprint_ekf = Node(
-    #     package="robot_localization",
-    #     executable="ekf_node",
-    #     name="base_to_footprint_ekf",
-    #     output="screen",
-    #     parameters=[
-    #         {"base_link_frame": base_frame},
-    #         {"use_sim_time": use_sim_time},
-    #         os.path.join(
-    #             get_package_share_directory("champ_base"),
-    #             "config",
-    #             "ekf",
-    #             "base_to_footprint.yaml",
-    #         ),
-    #     ],
-    #     remappings=[("odometry/filtered", "odom/local")],
-    # )
+    base_to_footprint_ekf = Node(
+        package="robot_localization",
+        executable="ekf_node",
+        name="base_to_footprint_ekf",
+        output="screen",
+        parameters=[
+            {"base_link_frame": base_frame},
+            {"use_sim_time": use_sim_time},
+            os.path.join(
+                get_package_share_directory("champ_base"),
+                "config",
+                "ekf",
+                "base_to_footprint.yaml",
+            ),
+        ],
+        remappings=[("odometry/filtered", "odom/local")],
+    )
 
-    # footprint_to_odom_ekf = Node(
-    #     package="robot_localization",
-    #     executable="ekf_node",
-    #     name="footprint_to_odom_ekf",
-    #     output="screen",
-    #     parameters=[
-    #         {"base_link_frame": base_frame},
-    #         {"use_sim_time": use_sim_time},
-    #         os.path.join(
-    #             get_package_share_directory("champ_base"),
-    #             "config",
-    #             "ekf",
-    #             "footprint_to_odom.yaml",
-    #         ),
-    #     ],
-    #     remappings=[("odometry/filtered", "odom")],
-    # )
+    footprint_to_odom_ekf = Node(
+        package="robot_localization",
+        executable="ekf_node",
+        name="footprint_to_odom_ekf",
+        output="screen",
+        parameters=[
+            {"base_link_frame": base_frame},
+            {"use_sim_time": use_sim_time},
+            os.path.join(
+                get_package_share_directory("champ_base"),
+                "config",
+                "ekf",
+                "footprint_to_odom.yaml",
+            ),
+        ],
+        remappings=[("odometry/filtered", "odom")],
+    )
 
-    # Joint State Publisher per muovere i joint in RViz
-    joint_state_publisher_gui = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui',
-        condition=IfCondition(LaunchConfiguration("gui")),
+    # TF Static Transform Publishers per una corretta catena TF
+    # Strategia: world -> odom (statico), odom -> base_footprint (dinamico via odometry), 
+    # base_footprint -> base_link (statico), base_link -> joints (dinamico via robot_state_publisher)
+    
+    # world_to_odom = Node(
+    #     package='tf2_ros',
+    #     executable='static_transform_publisher',
+    #     name='world_to_odom',
+    #     arguments=['0', '0', '0', '0', '0', '0', 'world', 'odom'],
+    #     output='screen',
+    #     parameters=[{"use_sim_time": use_sim_time}]
+    # )
+    
+    # Transform statico da base_footprint a base_link per la corretta altezza del robot
+    # base_footprint_to_base_link = Node(
+    #     package='tf2_ros',
+    #     executable='static_transform_publisher',
+    #     name='base_footprint_to_base_link',
+    #     arguments=['0', '0', '0.225', '0', '0', '0', 'base_footprint', 'base_link'],
+    #     output='screen',
+    #     parameters=[{"use_sim_time": use_sim_time}]
+    # )
+    
+    # # Nodo per pubblicare transform dinamico odom -> base_footprint basato sulla posa del robot
+    pose2tf_node = Node(
+        package='champ_base',
+        executable='pose2tf.py',
+        name='pose2tf',
+        output='screen',
         parameters=[{"use_sim_time": use_sim_time}]
     )
 
-    # Joint State Publisher (versione non-GUI come fallback)
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        parameters=[{"use_sim_time": use_sim_time}]
-    )
+    # model_to_footprint = Node(
+    # package='tf2_ros',
+    # executable='static_transform_publisher',
+    # name='model_to_footprint',
+    # arguments=[
+    #     '0','0','0',           # xyz
+    #     '0','0','0',           # rpy (deg)
+    #     LaunchConfiguration('robot_name'),  # parent: "go2"
+    #     'base_footprint'       # child
+    # ],
+    # parameters=[{'use_sim_time': use_sim_time}],
+    # )
 
-    # Teleop keyboard per controllare il robot
+
+    # RViz with corrected configuration
+    rviz2 = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        # arguments=['-d', os.path.join(unitree_go2_sim, "rviz/urdf_viewer.rviz")],
+        arguments=['-d', os.path.join(unitree_go2_sim, "rviz/rviz.rviz")],  # Use main rviz config
+        condition=IfCondition(LaunchConfiguration("rviz")),
+        parameters=[{"use_sim_time": use_sim_time}]  # FIXED: use sim time
+    )
+    
+    # Teleop keyboard for robot control
     teleop_keyboard = Node(
         package='teleop_twist_keyboard',
         executable='teleop_twist_keyboard',
         name='teleop_twist_keyboard',
+        prefix='xterm -e',
         output='screen',
         parameters=[{"use_sim_time": use_sim_time}],
-        prefix='xterm -e',  # Apre in una finestra separata
-    )
-    
-    # TF statico per fornire una base transform stabile
-    static_tf_publisher = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link'],
-        parameters=[{"use_sim_time": use_sim_time}]
+        remappings=[('/cmd_vel', '/cmd_vel')]  # Pubblica direttamente su /cmd_vel che CHAMP legge
     )
     
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
@@ -202,14 +233,11 @@ def generate_launch_description():
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={
-            'gz_args': '--physics-engine gz-physics-bullet-plugin -r',
-            'world': PathJoinSubstitution([
-                unitree_go2_description,
-                'worlds',
-                'simple.sdf'
-            ]), 
-        }.items(),
+        launch_arguments={'gz_args': PathJoinSubstitution([
+            unitree_go2_description,
+            'worlds',
+            'default.sdf'
+        ])}.items(),
     )
     
     # Spawn robot in Gazebo Sim
@@ -227,7 +255,7 @@ def generate_launch_description():
         ],
     )
     
-    # Bridge ROS 2 topics to Gazebo Sim
+    # Bridge ROS 2 topics to Gazebo Sim (FIXED)
     gazebo_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -235,63 +263,87 @@ def generate_launch_description():
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
         arguments=[
-            # Gazebo to ROS
+            # Gazebo to ROS - FIXED syntax
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/imu/data@sensor_msgs/msg/Imu@gz.msgs.IMU',
-            '/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V',
-            '/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model',
-            '/velodyne_points/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
-            '/unitree_lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
-            # '/velodyne_points@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
-            '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
-            '/rgb_image@sensor_msgs/msg/Image@gz.msgs.Image',
+            '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
+            '/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU',
+
+
+            # NESSUNO DI QUESTI SEMBRA ANDARE
+            # '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',  # Odometry standard
+            # '/model/go2/pose@geometry_msgs/msg/PoseStamped[gz.msgs.Pose_V',  # Model pose
+            # '/world/default/dynamic_pose/info@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+            # '/model/go2/pose@geometry_msgs/msg/PoseStamped[gz.msgs.Pose]',
+            # '/world/default/pose/info@ros_gz_interfaces/msg/PoseV[gz.msgs.Pose_V]',
+            # '/world/default/pose/info@ros_gz_interfaces/msg/Pose_V[gz.msgs.Pose]',  
+
+
+
+            '/velodyne_points/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
+            '/unitree_lidar/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
+            '/rgb_image@sensor_msgs/msg/Image[gz.msgs.Image',
             
-            # ROS to Gazebo
+            # ROS to Gazebo - FIXED syntax
             '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/joint_group_effort_controller/joint_trajectory@trajectory_msgs/msg/JointTrajectory]gz.msgs.JointTrajectory',
         ],
     )
     
-    # Commentiamo temporaneamente i controller automatici per avviarli manualmente
-    # controller_spawner_js = TimerAction(
-    #     period=30.0,  # Wait longer for Gazebo and plugins to fully initialize
-    #     actions=[
-    #         Node(
-    #             package="controller_manager",
-    #             executable="spawner",
-    #             output="screen",
-    #             arguments=[
-    #                 "--controller-manager-timeout", "120",  # Much longer timeout
-    #                 "joint_states_controller",  # No --inactive flag to ensure full activation
-    #             ],
-    #             parameters=[{"use_sim_time": use_sim_time}],
-    #         )
-    #     ]
-    # )
+    # Use spawner nodes directly to handle the configuration step. (load → configure → activate)
+    # STRATEGIA MIGLIORATA: spawner senza --inactive e attivazione diretta
+    controller_spawner_js = TimerAction(
+        period=15.0,  # Wait for Gazebo to fully initialize
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                output="screen",
+                arguments=[
+                    "--controller-manager-timeout", "60",  # Longer timeout
+                    "joint_states_controller",
+                    # Rimosso --inactive per tentare attivazione diretta
+                ],
+                parameters=[{"use_sim_time": use_sim_time}],
+            )
+        ]
+    )
 
-    # controller_spawner_effort = TimerAction(
-    #     period=35.0,  # Wait 5 seconds after joint_states_controller
-    #     actions=[
-    #         Node(
-    #             package="controller_manager",
-    #             executable="spawner",
-    #             output="screen",
-    #             arguments=[
-    #                 "--controller-manager-timeout", "120",  # Much longer timeout
-    #                 "joint_group_effort_controller",  # No --inactive flag to ensure full activation
-    #             ],
-    #             parameters=[{"use_sim_time": use_sim_time}],
-    #         )
-    #     ]
-    # )
+    # Backup activation in caso il spawner diretto non funzioni
+    controller_activator_js = TimerAction(
+        period=22.0,  # Più tempo per assicurarsi che sia caricato
+        actions=[
+            ExecuteProcess(
+                cmd=["ros2", "control", "set_controller_state", "joint_states_controller", "active"],
+                output='screen',
+            )
+        ]
+    )
+
+    controller_spawner_effort = TimerAction(
+        period=20.0,  # Wait 5 seconds after joint_states_controller
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                output="screen",
+                arguments=[
+                    "--controller-manager-timeout", "60",  # Longer timeout
+                    "joint_group_effort_controller",  # No --inactive flag to ensure full activation
+                ],
+                parameters=[{"use_sim_time": use_sim_time}],
+            )
+        ]
+    )
     
-    rviz2 = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', os.path.join(unitree_go2_sim, "rviz/rviz.rviz")],
-        condition=IfCondition(LaunchConfiguration("rviz")),
-        parameters=[{"use_sim_time": use_sim_time}]
+    # Shell script to manually check controller status 
+    controller_status_check = TimerAction(
+        period=25.0,  # Check status after controllers should be loaded
+        actions=[
+            ExecuteProcess(
+                cmd=["bash", "-c", "echo 'Checking controller status:' && ros2 control list_controllers"],
+                output='screen',
+            )
+        ]
     )
     
     return LaunchDescription(
@@ -310,22 +362,33 @@ def generate_launch_description():
             declare_world_init_heading,
             declare_description_path, 
             
-            # Solo RViz e robot description - NO Gazebo
+            # Gazebo and robot nodes first
+            gz_sim,
             robot_state_publisher_node,
+            gazebo_spawn_robot,
+            gazebo_bridge,
             
-            # TF statico
-            static_tf_publisher,
-            
-            # Joint publishers per il controllo
-            joint_state_publisher_gui,
-            joint_state_publisher,
-            
-            # Teleop per controllo da tastiera
-            teleop_keyboard,
-            
-            # CHAMP controller nodes per la cinematica
+            # CHAMP controller nodes
             quadruped_controller_node,
-            # state_estimator_node,  # Commentato per semplificare
+            state_estimator_node,
+            
+            # Odometry filtering
+            base_to_footprint_ekf,
+            footprint_to_odom_ekf,
+            
+            # TF Static transforms e dinamici
+            # world_to_odom,
+            # base_footprint_to_base_link,
+            pose2tf_node,  # Ri-abilitato per pubblicare transform dinamico
+            
+            # Controller spawners that handle the complete lifecycle
+            controller_spawner_js,
+            controller_activator_js,
+            controller_spawner_effort,
+            controller_status_check,
+            
+            # Control
+            teleop_keyboard,
             
             # Visualization (only if rviz flag is set)
             rviz2,
