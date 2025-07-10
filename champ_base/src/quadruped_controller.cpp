@@ -95,7 +95,20 @@ QuadrupedController::QuadrupedController():
 
     loop_timer_ = this->create_wall_timer(
          std::chrono::duration_cast<std::chrono::milliseconds>(period), std::bind(&QuadrupedController::controlLoop_, this));
-    req_pose_.position.z = gait_config_.nominal_height;
+    double init_x = 0.0, init_y = 0.0, init_z = gait_config_.nominal_height;
+    double init_yaw = 0.0;
+
+    this->get_parameter("init_x", init_x);
+    this->get_parameter("init_y", init_y);
+    this->get_parameter("init_z", init_z);
+    this->get_parameter("init_yaw", init_yaw);
+
+    req_pose_.position.x = init_x;
+    req_pose_.position.y = init_y;
+    req_pose_.position.z = init_z;
+    req_pose_.orientation.roll = 0.0;
+    req_pose_.orientation.pitch = 0.0;
+    req_pose_.orientation.yaw = init_yaw;
 }
 
 void QuadrupedController::controlLoop_()

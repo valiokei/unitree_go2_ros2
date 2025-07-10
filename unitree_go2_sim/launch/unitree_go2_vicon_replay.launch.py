@@ -7,6 +7,7 @@ from launch.actions import (
     ExecuteProcess,
     OpaqueFunction,
     SetLaunchConfiguration,
+    TimerAction,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -91,13 +92,22 @@ def generate_launch_description():
                 get_package_share_directory('unitree_go2_sim'),
                 'launch',
                 'unitree_go2_launch.py')
-        )
+        ),
+        launch_arguments={
+            'world_init_x': LaunchConfiguration('world_init_x'),
+            'world_init_y': LaunchConfiguration('world_init_y'),
+            'world_init_z': LaunchConfiguration('world_init_z'),
+            'world_init_heading': LaunchConfiguration('world_init_heading'),
+        }.items()
     )
 
     # Play the rosbag
-    bag_play = ExecuteProcess(
-        cmd=['ros2', 'bag', 'play', bag],
-        output='screen'
+    bag_play = TimerAction(
+        period=5.0,
+        actions=[ExecuteProcess(
+            cmd=['ros2', 'bag', 'play', bag],
+            output='screen'
+        )]
     )
 
     # Setup spawn pose using the first TF in the bag
