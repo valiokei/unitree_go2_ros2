@@ -105,6 +105,10 @@ def generate_launch_description():
             {"hardware_connected": False},
             {"publish_foot_contacts": True},
             {"close_loop_odom": True},
+            {"init_x": LaunchConfiguration('world_init_x')},
+            {"init_y": LaunchConfiguration('world_init_y')},
+            {"init_z": LaunchConfiguration('world_init_z')},
+            {"init_yaw": LaunchConfiguration('world_init_heading')},
         ],
         remappings=[("/cmd_vel/smooth", "/cmd_vel")],
     )
