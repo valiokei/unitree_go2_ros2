@@ -19,7 +19,8 @@ def generate_launch_description():
 
     def launch_setup(context, *args, **kwargs):
         bag_path = LaunchConfiguration('bag').perform(context)
-        use_sim_time = LaunchConfiguration('use_sim_time').perform(context)
+        use_sim_time_str = LaunchConfiguration('use_sim_time').perform(context)
+        use_sim_time = use_sim_time_str.lower() in ['true', '1']
 
         def read_initial_pose(path, target):
             reader = SequentialReader()
@@ -57,7 +58,7 @@ def generate_launch_description():
                 ])
             ),
             launch_arguments={
-                'use_sim_time': use_sim_time,
+                'use_sim_time': use_sim_time_str,
                 'world_init_x': str(x),
                 'world_init_y': str(y),
                 'world_init_z': str(z),

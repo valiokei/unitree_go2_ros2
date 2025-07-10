@@ -5,6 +5,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import tf2_ros
+from tf2_msgs.msg import TFMessage
 import tf_transformations
 
 
@@ -27,22 +28,36 @@ class TfFollower(Node):
         self.tf_static_topic = self.get_parameter('tf_static_topic').value
 
         self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(
-            self.tf_buffer,
-            self,
-            tf_topic=self.tf_topic,
-            static_tf_topic=self.tf_static_topic,
-        )
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+
+        self.create_subscription(TFMessage, self.tf_topic, self._tf_cb, 10)
+        self.create_subscription(TFMessage, self.tf_static_topic, self._tf_static_cb, 10)
+
+        self.target_transform = None
 
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(0.05, self.control_loop)
 
+    def _tf_cb(self, msg: TFMessage):
+        for tr in msg.transforms:
+            if tr.child_frame_id == self.target_frame:
+                self.target_transform = tr
+            self.tf_buffer.set_transform(tr, 'vicon_bag')
+
+    def _tf_static_cb(self, msg: TFMessage):
+        for tr in msg.transforms:
+            self.tf_buffer.set_transform_static(tr, 'vicon_bag')
+
     def control_loop(self):
+        if self.target_transform is None:
+            return
+
         try:
-            target = self.tf_buffer.lookup_transform('world', self.target_frame, rclpy.time.Time())
             robot = self.tf_buffer.lookup_transform('world', self.robot_frame, rclpy.time.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             return
+
+        target = self.target_transform
 
         dx = target.transform.translation.x - robot.transform.translation.x
         dy = target.transform.translation.y - robot.transform.translation.y
