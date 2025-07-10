@@ -16,14 +16,23 @@ class TfFollower(Node):
         self.declare_parameter('robot_frame', 'base_footprint')
         self.declare_parameter('kp_linear', 1.0)
         self.declare_parameter('kp_angular', 2.0)
+        self.declare_parameter('tf_topic', '/vicon_tf')
+        self.declare_parameter('tf_static_topic', '/vicon_tf_static')
 
         self.target_frame = self.get_parameter('target_frame').value
         self.robot_frame = self.get_parameter('robot_frame').value
         self.kp_linear = self.get_parameter('kp_linear').value
         self.kp_angular = self.get_parameter('kp_angular').value
+        self.tf_topic = self.get_parameter('tf_topic').value
+        self.tf_static_topic = self.get_parameter('tf_static_topic').value
 
         self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+        self.tf_listener = tf2_ros.TransformListener(
+            self.tf_buffer,
+            self,
+            tf_topic=self.tf_topic,
+            static_tf_topic=self.tf_static_topic,
+        )
 
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(0.05, self.control_loop)
