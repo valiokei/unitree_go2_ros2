@@ -139,7 +139,8 @@ void QuadrupedController::cmdPoseCallback_(const geometry_msgs::msg::Pose::Share
 
     req_pose_.position.x = msg->position.x;
     req_pose_.position.y = msg->position.y;
-    req_pose_.position.z = msg->position.z +  gait_config_.nominal_height;
+    // Height from msg is already absolute, do not add nominal height again
+    req_pose_.position.z = msg->position.z;
 }
 
 void QuadrupedController::publishJoints_(float target_joints[12])
