@@ -69,6 +69,7 @@ install(  PROGRAMS
     scripts/joint_trajectory_to_joint_states.py
     scripts/simple_odometry.py
     scripts/pose2tf.py
+    scripts/vicon_tf_to_pose.py
     # scripts/interactive_target_mover.py
     DESTINATION lib/${PROJECT_NAME}
 )
