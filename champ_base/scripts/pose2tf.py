@@ -76,26 +76,20 @@ class GzPoseBridge(Node):
         self.gz_node = gz_transport.Node()
         self._attach_subscriber()
 
-        self.get_logger().info(
-            f'Bridging [{self.gz_topic}] → ROS (/{self.model_name}/gt_pose , TF)')
+        # ...existing code...
 
     # ------------------------------------------------------------------
     def _attach_subscriber(self):
         """Collega il callback corretto al topic Gazebo."""
-        print(f"Attaching subscriber to topic: {self.gz_topic}")
         if self.gz_topic.endswith('/pose/info'):
-            print("Using Pose_V (vector of poses)")
             # topic vector → Pose_V
             self.gz_node.subscribe(
                 Pose_V, self.gz_topic, self._cb_pose_v)           
         else:
-            print("Using Pose (single pose)")
             # topic singolo → Pose
             self.gz_node.subscribe(Pose, self.gz_topic, self._cb_pose)
     # ------------------------------------------------------------------
     def _cb_pose(self, msg_bin):
-        self.get_logger().info(
-            f"Received Pose: {msg_bin[:50]}... (truncated)")
         pose = Pose()
         pose.ParseFromString(msg_bin)
         self._publish_ros(pose)
@@ -104,14 +98,7 @@ class GzPoseBridge(Node):
         # self.get_logger().info(
         #     f"Received Pose_V {(msg)} ")
         for p in msg.pose:
-            self.get_logger().info(
-                f"Received Pose: name={p.name}, position=({p.position.x}, {p.position.y}, {p.position.z}), "
-                f"orientation=({p.orientation.x}, {p.orientation.y}, {p.orientation.z}, {p.orientation.w})")
-            # Se il nome della posa corrisponde al modello, pubblica
             if p.name == self.model_name:
-                self.get_logger().info(
-                    f"Publishing pose for model: {self.model_name}")
-                # Pubblica la posa su ROS e TF
                 self._publish_ros(p)
                 break
 
@@ -131,15 +118,8 @@ class GzPoseBridge(Node):
         ps.pose.orientation.z = p.orientation.z
         ps.pose.orientation.w = p.orientation.w
         self.pub_pose.publish(ps)
-        self.get_logger().info(
-            f"Published PoseStamped: position=({p.position.x}, {p.position.y}, {p.position.z}), "
-            f"orientation=({p.orientation.x}, {p.orientation.y}, {p.orientation.z}, {p.orientation.w})")
-        
         # TF (opzionale)
         if self.br:
-            self.get_logger().info(
-                f"Publishing TF: world -> {self.child_frame} at {now.sec}.{now.nanosec}")
-
             tf = TransformStamped()
             tf.header.stamp = now
             tf.header.frame_id = 'world'
@@ -151,9 +131,6 @@ class GzPoseBridge(Node):
             tf.transform.rotation.y = p.orientation.y
             tf.transform.rotation.z = p.orientation.z
             tf.transform.rotation.w = p.orientation.w
-            self.get_logger().info(
-                f"Transform: translation=({p.position.x}, {p.position.y}, {p.position.z}), "
-                f"rotation=({p.orientation.x}, {p.orientation.y}, {p.orientation.z}, {p.orientation.w})")
             self.br.sendTransform(tf)
 
     # ------------------------------------------------------------------
