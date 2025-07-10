@@ -14,10 +14,12 @@ class ViconTFToPose(Node):
         self.declare_parameter('target_frame', 'vicon/robodog_magnetic/robodog_magnetic')
         self.declare_parameter('world_frame', 'vicon/world')
         self.declare_parameter('pose_topic', 'body_pose')
+        self.declare_parameter('nominal_height', 0.225)
 
         self.target_frame = self.get_parameter('target_frame').get_parameter_value().string_value
         self.world_frame = self.get_parameter('world_frame').get_parameter_value().string_value
         pose_topic = self.get_parameter('pose_topic').get_parameter_value().string_value
+        self.nominal_height = self.get_parameter('nominal_height').get_parameter_value().double_value
 
         self.pose_pub = self.create_publisher(Pose, pose_topic, 10)
 
@@ -31,7 +33,7 @@ class ViconTFToPose(Node):
                 pose = Pose()
                 pose.position.x = transform.transform.translation.x
                 pose.position.y = transform.transform.translation.y
-                pose.position.z = transform.transform.translation.z
+                pose.position.z = self.nominal_height
                 pose.orientation = transform.transform.rotation
                 self.pose_pub.publish(pose)
 
