@@ -21,7 +21,13 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 install(
-  DIRECTORY rviz 
+  DIRECTORY rviz
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS
+    scripts/tf_follower.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()
