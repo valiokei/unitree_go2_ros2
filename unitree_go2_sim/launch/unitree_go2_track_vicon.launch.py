@@ -24,7 +24,14 @@ def generate_launch_description():
 
         def read_initial_pose(path, target):
             reader = SequentialReader()
-            storage_options = StorageOptions(uri=path, storage_id='sqlite3')
+            # Detect storage_id based on file extension
+            if path.endswith('.mcap') or (
+                os.path.isdir(path) and any(f.endswith('.mcap') for f in os.listdir(path))
+            ):
+                storage_id = 'mcap'
+            else:
+                storage_id = 'sqlite3'
+            storage_options = StorageOptions(uri=path, storage_id=storage_id)
             converter_options = ConverterOptions('', '')
             reader.open(storage_options, converter_options)
 

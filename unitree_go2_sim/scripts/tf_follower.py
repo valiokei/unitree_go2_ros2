@@ -30,6 +30,10 @@ class TfFollower(Node):
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
+        self.get_logger().info(
+            f"Tracking {self.target_frame} with respect to {self.robot_frame}"
+        )
+
         self.create_subscription(TFMessage, self.tf_topic, self._tf_cb, 10)
         self.create_subscription(TFMessage, self.tf_static_topic, self._tf_static_cb, 10)
 
@@ -41,7 +45,10 @@ class TfFollower(Node):
     def _tf_cb(self, msg: TFMessage):
         for tr in msg.transforms:
             if tr.child_frame_id == self.target_frame:
+                first = self.target_transform is None
                 self.target_transform = tr
+                if first:
+                    self.get_logger().info('Received first target transform')
             self.tf_buffer.set_transform(tr, 'vicon_bag')
 
     def _tf_static_cb(self, msg: TFMessage):
@@ -53,8 +60,14 @@ class TfFollower(Node):
             return
 
         try:
-            robot = self.tf_buffer.lookup_transform('world', self.robot_frame, rclpy.time.Time())
+            robot = self.tf_buffer.lookup_transform(
+                'world',
+                self.robot_frame,
+                rclpy.time.Time(),
+                timeout=rclpy.duration.Duration(seconds=0.1)
+            )
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+            self.get_logger().debug('Robot transform not available yet')
             return
 
         target = self.target_transform
@@ -82,6 +95,9 @@ class TfFollower(Node):
         twist.angular.z = max(min(twist.angular.z, 1.5), -1.5)
 
         self.cmd_pub.publish(twist)
+        self.get_logger().debug(
+            f"cmd_vel: [{twist.linear.x:.2f}, {twist.linear.y:.2f}, {twist.angular.z:.2f}]"
+        )
 
 
 def main(args=None):
